@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "技术基础/编程语言/swift-core.md",
+                "file": "技术基础/项目/fit-rtmpose-plan.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "swift-core"
+              "title": "fit-rtmpose-plan"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "技术基础/编程语言/swift-core.md",
+                "file": "技术基础/项目/fit-rtmpose-plan.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "swift-core 的反向链接列表"
+              "title": "fit-rtmpose-plan 的反向链接列表"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "技术基础/编程语言/swift-core.md",
+                "file": "技术基础/项目/fit-rtmpose-plan.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "swift-core 的出链列表"
+              "title": "fit-rtmpose-plan 的出链列表"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "技术基础/编程语言/swift-core.md",
+                "file": "技术基础/项目/fit-rtmpose-plan.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "swift-core 的大纲"
+              "title": "fit-rtmpose-plan 的大纲"
             }
           }
         ]
@@ -185,11 +185,26 @@
   },
   "active": "4c4523d429a8bf48",
   "lastOpenFiles": [
-    "技术基础/框架/swiftui-drag-and-env.md",
-    "技术基础/index.md",
+    "技术基础/项目/fit-todo.md",
+    "技术基础/项目/fit-videopose3d.md",
+    "技术基础/项目/fit-exercise-config-schema.md",
+    "技术基础/项目/fit-food-calories.md",
+    "技术基础/项目/fit-standard-exercise-model.md",
+    "技术基础/项目/index.md",
+    "技术基础/项目/fit-refactoring-targets.md",
+    "技术基础/项目/fit-design-patterns.md",
+    "技术基础/项目/fit-motion-compare.md",
+    "技术基础/项目/fit-ai-voice-coach.md",
+    "技术基础/项目/fit-pose-detection-implementation.md",
+    "技术基础/框架/swiftdata.md",
     "_index.md",
-    "2026-05-11.md",
+    "技术基础/index.md",
+    "技术基础/框架/coreml-integration.md",
     "技术基础/编程语言/swift-core.md",
+    "技术基础/项目/fit-rtmpose-plan.md",
+    "技术基础/框架/rtmpose-wholebody.md",
+    "技术基础/框架/swiftui-drag-and-env.md",
+    "2026-05-11.md",
     "swiftui/state-observation.md",
     "投资/index.md",
     "策略博弈/index.md",

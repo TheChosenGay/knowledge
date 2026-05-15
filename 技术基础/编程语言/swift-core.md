@@ -458,7 +458,72 @@ iOS 16 上 `ObservableObject` + `@Published` 确实在用 Combine：
 | 底层  | **Combine**                       | Observation 框架  |
 | 精度  | 对象级别                              | 属性级别            |
 
+---
+
+## 7. #Predicate — 类型安全的条件表达式
+
+Swift 5.9 引入，替代 `NSPredicate` 字符串写法，编译期检查类型安全。
+
+### 对比
+
+```swift
+// 老写法：字符串，运行时才知道错没错
+NSPredicate(format: "age > %d AND name == %@", 18, "Alice")
+
+// 新写法：编译期检查
+#Predicate<Person> { $0.age > 18 && $0.name == "Alice" }
+```
+
+### 基本用法
+
+```swift
+// 定义
+let isAdult = #Predicate<Person> { $0.age >= 18 }
+
+// 手动过滤
+let adults = try people.filter(isAdult)
+
+// SwiftData @Query
+@Query(filter: #Predicate<Todo> { $0.isCompleted == false })
+var pendingTodos: [Todo]
+```
+
+### 支持的操作
+
+```swift
+#Predicate<Item> { $0.price > 100 }                    // 比较
+#Predicate<Item> { $0.price > 100 && $0.inStock }      // 逻辑组合
+#Predicate<Item> { $0.name.contains("Pro") }            // 字符串
+#Predicate<Todo> { $0.tag?.name == "work" }            // 可选值
+#Predicate<Order> { $0.items.isEmpty }                  // 集合
+```
+
+### 动态构建（运行时捕获外部变量）
+
+```swift
+func makePredicate(keyword: String) -> Predicate<Todo> {
+    #Predicate<Todo> { $0.title.contains(keyword) }  // 捕获 keyword
+}
+
+// SwiftData @Query 动态 filter
+struct FilteredList: View {
+    @Query var todos: [Todo]
+    init(keyword: String) {
+        _todos = Query(filter: #Predicate<Todo> { $0.title.contains(keyword) })
+    }
+}
+```
+
+### 与 SwiftData 的关系
+
+`#Predicate` 被转换成 SQL WHERE 子句在数据库层过滤，效率高于内存过滤。
+
+> **注意**：predicate 内不能用自定义函数或复杂计算，否则运行时报错。复杂逻辑在内存中二次 `.filter` 处理。
+
+---
+
 ## 相关
 
 - [[../框架/swiftui-state|SwiftUI 状态观察]]
+- [[../框架/swiftdata|SwiftData]] — #Predicate 在 @Query 中的应用
 - [[../项目/fit-overview|PostureAI 项目]]
