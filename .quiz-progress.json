@@ -1,0 +1,337 @@
+{
+  "version": 2,
+  "current_domain": null,
+  "domains": {
+    "技术基础": {
+      "topics": {
+        "编程语言/swift-core": {
+          "file": "编程语言/swift-core.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "框架/coreml-integration": {
+          "file": "框架/coreml-integration.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "框架/rtmpose-wholebody": {
+          "file": "框架/rtmpose-wholebody.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "框架/swiftdata": {
+          "file": "框架/swiftdata.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "框架/swiftui-drag-and-env": {
+          "file": "框架/swiftui-drag-and-env.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "框架/swiftui-state": {
+          "file": "框架/swiftui-state.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "项目/fit-ai-voice-coach": {
+          "file": "项目/fit-ai-voice-coach.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "项目/fit-design-patterns": {
+          "file": "项目/fit-design-patterns.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "项目/fit-exercise-config-schema": {
+          "file": "项目/fit-exercise-config-schema.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "项目/fit-food-calories": {
+          "file": "项目/fit-food-calories.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "项目/fit-motion-compare": {
+          "file": "项目/fit-motion-compare.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "项目/fit-overview": {
+          "file": "项目/fit-overview.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "项目/fit-pose-detection-implementation": {
+          "file": "项目/fit-pose-detection-implementation.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "项目/fit-refactoring-targets": {
+          "file": "项目/fit-refactoring-targets.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "项目/fit-rtmpose-plan": {
+          "file": "项目/fit-rtmpose-plan.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "项目/fit-standard-exercise-model": {
+          "file": "项目/fit-standard-exercise-model.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "项目/fit-videopose3d": {
+          "file": "项目/fit-videopose3d.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        }
+      }
+    },
+    "投资": {
+      "topics": {
+        "金融基础/财务报表入门": {
+          "file": "金融基础/财务报表入门.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "金融基础/估值方法": {
+          "file": "金融基础/估值方法.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "金融基础/股票基础": {
+          "file": "金融基础/股票基础.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "金融基础/金融市场概览": {
+          "file": "金融基础/金融市场概览.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "金融基础/资产类别": {
+          "file": "金融基础/资产类别.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "投资理念/风险与收益": {
+          "file": "投资理念/风险与收益.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        }
+      }
+    },
+    "策略博弈": {
+      "topics": {}
+    },
+    "软件设计": {
+      "topics": {
+        "编码设计/代码抽象": {
+          "file": "编码设计/代码抽象.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "编码设计/代码架构管理": {
+          "file": "编码设计/代码架构管理.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "编码设计/依赖管理": {
+          "file": "编码设计/依赖管理.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "存储/Redis": {
+          "file": "存储/Redis/index.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "存储/MySQL": {
+          "file": "存储/MySQL/index.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "存储/Kafka": {
+          "file": "存储/Kafka/index.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "基础设施/Docker-K8s": {
+          "file": "基础设施/Docker-K8s/index.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "AI/LLM": {
+          "file": "AI/LLM/index.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "AI/RAG": {
+          "file": "AI/RAG/index.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "系统设计/日志系统设计": {
+          "file": "系统设计/日志系统设计/index.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "系统设计/缓存系统设计": {
+          "file": "系统设计/缓存系统设计/index.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        },
+        "系统设计/频道成员列表设计": {
+          "file": "系统设计/频道成员列表设计/index.md",
+          "mastery": 0.3,
+          "last_tested": null,
+          "total_attempts": 0,
+          "correct": 0,
+          "weak_points": [],
+          "strong_points": []
+        }
+      }
+    }
+  },
+  "session_history": []
+}
