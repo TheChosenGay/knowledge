@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "技术基础/项目/fit-rtmpose-plan.md",
+                "file": "技术基础/框架/rtmpose-wholebody.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "fit-rtmpose-plan"
+              "title": "rtmpose-wholebody"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "技术基础/项目/fit-rtmpose-plan.md",
+                "file": "技术基础/框架/rtmpose-wholebody.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "fit-rtmpose-plan 的反向链接列表"
+              "title": "rtmpose-wholebody 的反向链接列表"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "技术基础/项目/fit-rtmpose-plan.md",
+                "file": "技术基础/框架/rtmpose-wholebody.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "fit-rtmpose-plan 的出链列表"
+              "title": "rtmpose-wholebody 的出链列表"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "技术基础/项目/fit-rtmpose-plan.md",
+                "file": "技术基础/框架/rtmpose-wholebody.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "fit-rtmpose-plan 的大纲"
+              "title": "rtmpose-wholebody 的大纲"
             }
           }
         ]
@@ -185,6 +185,14 @@
   },
   "active": "4c4523d429a8bf48",
   "lastOpenFiles": [
+    "swiftdata_modelcontext_concurrency.md",
+    "技术基础/项目/fit-rtmpose-plan.md",
+    "投资/量化/第一次因子回测.md",
+    "投资/量化/实盘部署.md",
+    "投资/量化/回测框架.md",
+    "投资/量化/因子投资.md",
+    "投资/量化/策略类型.md",
+    "投资/量化/index.md",
     "策略博弈/谈判/index.md",
     "策略博弈/谈判",
     "软件设计/系统设计/频道成员列表设计/薄弱点.md",
@@ -208,14 +216,6 @@
     "软件设计/存储/MySQL/index.md",
     "软件设计/存储/MySQL/index.md.tmp.59326.8c39cf19d598",
     "软件设计/存储/Kafka/index.md",
-    "软件设计/存储/Redis/index.md",
-    "软件设计/编码设计/代码架构管理.md",
-    "软件设计/编码设计/依赖管理.md",
-    "软件设计/编码设计/代码抽象.md",
-    "软件设计/编码设计/index.md",
-    "投资/炒股/index.md",
-    "投资/炒股/行业研究.md",
-    "软件设计/index.md",
     "软件设计/系统设计/频道成员列表设计",
     "软件设计/系统设计/缓存系统设计",
     "软件设计/系统设计/日志系统设计",

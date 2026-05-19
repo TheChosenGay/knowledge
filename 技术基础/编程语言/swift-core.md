@@ -522,6 +522,612 @@ struct FilteredList: View {
 
 ---
 
+## 8. `@escaping @Sendable` 闭包
+
+典型函数签名：
+
+```swift
+func query(
+    messages: [StreamingChatMessage],
+    model: String,
+    maxTokens: Int,
+    onToken: @escaping @Sendable (String) -> Void,
+    onComplete: @escaping @Sendable (Error?) -> Void
+)
+```
+
+`onToken: @escaping @Sendable (String) -> Void` 可以拆成：
+
+```text
+onToken     参数名
+(String)    闭包输入一个 String
+Void        闭包没有返回值
+@escaping   query 返回后，这个闭包仍可能被保存并继续调用
+@Sendable   这个闭包可能跨并发边界调用，捕获内容需要满足并发安全
+```
+
+`@escaping` 常见于异步回调、网络请求、流式 token 返回：函数先返回，后续数据到达时继续调用闭包。
+
+```swift
+func query(onToken: @escaping (String) -> Void) {
+    self.tokenHandler = onToken   // 被保存到函数外，所以必须 escaping
+}
+```
+
+`@Sendable` 与 Swift 并发有关，表示闭包可以被安全地传给其他 task / actor / 并发执行域。
+
+```swift
+func query(onToken: @escaping @Sendable (String) -> Void) {
+    Task.detached {
+        onToken("hello")
+    }
+}
+```
+
+调用时可以写成普通闭包：
+
+```swift
+client.query(
+    messages: messages,
+    model: "gpt-4",
+    maxTokens: 1000,
+    onToken: { token in
+        print(token)
+    },
+    onComplete: { error in
+        print(error as Any)
+    }
+)
+```
+
+也可以用多尾随闭包：
+
+```swift
+client.query(
+    messages: messages,
+    model: "gpt-4",
+    maxTokens: 1000
+) { token in
+    print(token)
+} onComplete: { error in
+    print(error as Any)
+}
+```
+
+注意：`@Sendable` 不等于主线程。如果闭包里要更新 UI，需要切回 `MainActor`：
+
+```swift
+onToken: { token in
+    Task { @MainActor in
+        output += token
+    }
+}
+```
+
+### 流式响应的几种处理方式
+
+流式响应不一定都要用闭包。Swift 中常见有三种方式：闭包回调、`AsyncSequence` / `AsyncThrowingStream`、Combine Publisher。
+
+#### 方式一：闭包回调
+
+适合简单流式回调，或者底层 API 本来就是 callback / delegate 风格。
+
+```swift
+func query(
+    onToken: @escaping @Sendable (String) -> Void,
+    onComplete: @escaping @Sendable (Error?) -> Void
+)
+```
+
+调用：
+
+```swift
+client.query(
+    onToken: { token in
+        output += token
+    },
+    onComplete: { error in
+        print(error as Any)
+    }
+)
+```
+
+优点：简单、兼容老代码、容易接网络 delegate / callback API。
+
+缺点：错误处理分散，取消不够优雅，多个流组合时容易混乱，UI 更新要自己切回 `MainActor`。
+
+#### 方式二：`AsyncSequence` / `AsyncThrowingStream`
+
+现代 Swift 并发代码更推荐这种方式。函数返回一个异步 token 流：
+
+```swift
+func queryStream() -> AsyncThrowingStream<String, Error> {
+    AsyncThrowingStream { continuation in
+        continuation.yield("hello")
+        continuation.finish()
+    }
+}
+```
+
+调用：
+
+```swift
+Task {
+    do {
+        for try await token in client.queryStream() {
+            output += token
+        }
+    } catch {
+        print(error)
+    }
+}
+```
+
+优点：语义最像“流”，`for await` 清晰，错误可用 `throw` 表达，取消更自然，也更容易和 Swift Concurrency 组合。
+
+缺点：比闭包稍复杂；如果底层是 callback / delegate API，需要再包一层。
+
+#### 方式三：Combine Publisher
+
+如果项目已经大量使用 Combine，可以返回 Publisher：
+
+```swift
+func queryPublisher() -> AnyPublisher<String, Error>
+```
+
+调用：
+
+```swift
+client.queryPublisher()
+    .receive(on: DispatchQueue.main)
+    .sink(
+        receiveCompletion: { completion in
+            print(completion)
+        },
+        receiveValue: { token in
+            output += token
+        }
+    )
+```
+
+优点：适合响应式管道，可以组合、debounce、merge、retry。
+
+缺点：学习成本高；新 SwiftUI / Swift Concurrency 代码里，很多场景已经可以用 `async/await` 和 `AsyncSequence` 替代。
+
+#### 选择建议
+
+| 场景 | 推荐 |
+|---|---|
+| 简单回调、快速接入 | 闭包 |
+| 新 Swift 并发代码 | `AsyncThrowingStream` |
+| 已有 Combine 架构 | Combine Publisher |
+| 需要 `for await` 消费 token | `AsyncSequence` |
+| 需要取消、错误传播、组合多个流 | `AsyncThrowingStream` |
+
+对 AI token streaming 这类场景，更推荐：
+
+```swift
+func streamChat(...) -> AsyncThrowingStream<String, Error>
+```
+
+使用：
+
+```swift
+Task {
+    do {
+        for try await token in client.streamChat(...) {
+            await MainActor.run {
+                output += token
+            }
+        }
+    } catch {
+        await MainActor.run {
+            errorMessage = error.localizedDescription
+        }
+    }
+}
+```
+
+### `AsyncThrowingStream` 的取消机制
+
+取消分两层：
+
+```text
+消费端取消 Task
+        ↓
+AsyncThrowingStream 停止被消费
+        ↓
+continuation.onTermination 通知生产端
+        ↓
+开发者手动取消底层网络请求 / 子 Task
+```
+
+关键点：`AsyncThrowingStream` 不会自动取消底层网络请求，需要在 `onTermination` 中处理。
+
+#### 消费端取消
+
+保存消费流的 task：
+
+```swift
+var streamTask: Task<Void, Never>?
+
+streamTask = Task {
+    do {
+        for try await token in client.streamChat() {
+            await MainActor.run {
+                output += token
+            }
+        }
+    } catch is CancellationError {
+        // 用户主动取消，通常不当作错误
+    } catch {
+        await MainActor.run {
+            errorMessage = error.localizedDescription
+        }
+    }
+}
+```
+
+取消：
+
+```swift
+streamTask?.cancel()
+streamTask = nil
+```
+
+SwiftUI 的 `.task {}` 会在 View 消失时自动取消消费 task，但前提是 stream 内部正确响应取消。
+
+#### 生产端响应取消
+
+推荐结构：
+
+```swift
+func streamChat() -> AsyncThrowingStream<String, Error> {
+    AsyncThrowingStream { continuation in
+        let producerTask = Task {
+            do {
+                for try await token in someNetworkTokenSource() {
+                    try Task.checkCancellation()
+                    continuation.yield(token)
+                }
+
+                continuation.finish()
+            } catch is CancellationError {
+                continuation.finish(throwing: CancellationError())
+            } catch {
+                continuation.finish(throwing: error)
+            }
+        }
+
+        continuation.onTermination = { @Sendable _ in
+            producerTask.cancel()
+        }
+    }
+}
+```
+
+重点：
+
+```swift
+continuation.onTermination = { @Sendable _ in
+    producerTask.cancel()
+}
+```
+
+外部停止消费、task 被取消、stream 结束时，都可以通过 `onTermination` 通知生产端，让内部 task 停止继续生产数据。
+
+#### 包装 URLSessionDataTask 时
+
+如果底层是 callback API，也要在 `onTermination` 里取消真实请求：
+
+```swift
+func streamChat() -> AsyncThrowingStream<String, Error> {
+    AsyncThrowingStream { continuation in
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error {
+                continuation.finish(throwing: error)
+                return
+            }
+
+            if let data, let text = String(data: data, encoding: .utf8) {
+                continuation.yield(text)
+            }
+
+            continuation.finish()
+        }
+
+        task.resume()
+
+        continuation.onTermination = { @Sendable _ in
+            task.cancel()
+        }
+    }
+}
+```
+
+否则外层 `streamTask?.cancel()` 后，网络请求可能还在继续。
+
+#### `break` 与 `cancel()` 的区别
+
+```swift
+for try await token in stream {
+    if token == "[DONE]" {
+        break
+    }
+}
+```
+
+`break` 是停止当前循环消费。
+
+```swift
+streamTask?.cancel()
+```
+
+`cancel()` 是取消整个消费任务，语义更明确，适合“用户点击停止生成”。
+
+#### 最容易漏的问题
+
+不要只在 stream 内部启动一个匿名 task：
+
+```swift
+func streamChat() -> AsyncThrowingStream<String, Error> {
+    AsyncThrowingStream { continuation in
+        Task {
+            // 持续读取网络流
+        }
+    }
+}
+```
+
+这样外部取消消费后，内部 task 没有被保存，也没有在 `onTermination` 里取消，可能继续运行。
+
+正确模式：
+
+```swift
+let producerTask = Task { ... }
+
+continuation.onTermination = { @Sendable _ in
+    producerTask.cancel()
+}
+```
+
+总结：消费端用 `Task.cancel()`；生产端用 `continuation.onTermination` 监听取消；在 `onTermination` 里取消底层 task / network request。
+
+### `AsyncThrowingStream` 的实现细节
+
+`AsyncThrowingStream` 可以理解为把“回调式 / 事件式异步数据源”包装成可以用 `for try await` 消费的异步序列。
+
+```text
+Producer 生产端
+    continuation.yield(value)
+    continuation.finish()
+    continuation.finish(throwing: error)
+
+Consumer 消费端
+    for try await value in stream
+```
+
+它的核心是把 callback 的 push 模型桥接成 `AsyncSequence` 的 pull 模型：
+
+```text
+producer yield(value)
+        ↓
+AsyncThrowingStream 内部缓冲 / 恢复等待者
+        ↓
+consumer iterator.next() 拿到 value
+```
+
+#### 基本结构
+
+```swift
+func makeStream() -> AsyncThrowingStream<String, Error> {
+    AsyncThrowingStream { continuation in
+        continuation.yield("A")
+        continuation.yield("B")
+        continuation.finish()
+    }
+}
+```
+
+消费：
+
+```swift
+Task {
+    do {
+        for try await value in makeStream() {
+            print(value)
+        }
+    } catch {
+        print(error)
+    }
+}
+```
+
+`for try await` 大致等价于：
+
+```swift
+var iterator = stream.makeAsyncIterator()
+
+while let value = try await iterator.next() {
+    print(value)
+}
+```
+
+`next()` 的行为：
+
+| 状态 | `next()` 结果 |
+|---|---|
+| buffer 里已有值 | 立即返回下一个值 |
+| 暂时没值，但没结束 | 挂起等待 |
+| producer 调用 `yield` | 恢复等待中的 `next()` |
+| producer 调用 `finish()` | 返回 `nil`，循环结束 |
+| producer 调用 `finish(throwing:)` | 抛出错误 |
+
+#### Continuation
+
+`continuation` 是生产端控制句柄：
+
+```swift
+continuation.yield(token)              // 发送一个值
+continuation.finish()                  // 正常结束
+continuation.finish(throwing: error)   // 失败结束
+```
+
+一旦 `finish` 后，stream 就结束了，后续 `yield` 不应该再继续依赖。
+
+#### BufferingPolicy
+
+如果生产端比消费端快，值会进入内部 buffer。默认 `.unbounded` 可能导致内存上涨。
+
+可以显式指定策略：
+
+```swift
+AsyncThrowingStream<String, Error>(
+    bufferingPolicy: .bufferingNewest(10)
+) { continuation in
+    ...
+}
+```
+
+常见策略：
+
+| 策略 | 含义 | 适合场景 |
+|---|---|---|
+| `.unbounded` | 不限制缓冲数量 | 低频事件、不能丢数据的 token 流 |
+| `.bufferingNewest(n)` | 只保留最新 n 个，旧值可被丢弃 | UI 状态、传感器、摄像头帧 |
+| `.bufferingOldest(n)` | 保留最早 n 个，新值塞不进时丢弃 | 需要优先处理早期事件 |
+
+高频流例如摄像头帧通常应该：
+
+```swift
+AsyncThrowingStream<Frame, Error>(
+    bufferingPolicy: .bufferingNewest(1)
+) { continuation in
+    ...
+}
+```
+
+#### `yield` 的返回值
+
+`yield` 可以返回结果，用于判断值是否进入 buffer、被丢弃，或 stream 已结束：
+
+```swift
+let result = continuation.yield(value)
+
+switch result {
+case .enqueued:
+    break
+case .dropped(let dropped):
+    print("dropped", dropped)
+case .terminated:
+    return
+}
+```
+
+如果返回 `.terminated`，说明消费端已经结束或取消，生产端应该停止继续生产。
+
+#### `finish()` 很重要
+
+如果忘记调用 `finish()`，消费端可能一直挂起等待下一个值：
+
+```swift
+continuation.yield("done")
+continuation.finish()
+```
+
+出错时用：
+
+```swift
+continuation.finish(throwing: error)
+```
+
+如果不需要错误传播，应使用 `AsyncStream<Element>`，而不是 `AsyncThrowingStream<Element, Error>`。
+
+#### 创建闭包的执行时机
+
+`AsyncThrowingStream` 的构建闭包通常在创建 stream 时执行，不是一定等到 `for await` 开始时才执行。
+
+```swift
+let stream = AsyncThrowingStream<String, Error> { continuation in
+    startNetworkRequest()
+}
+```
+
+调用 `let stream = streamChat()` 时，网络请求可能已经启动，即使还没有开始消费。因此要注意 stream 的生命周期。
+
+#### 包装回调式 API
+
+底层如果是 callback API：
+
+```swift
+func startStreaming(
+    onToken: @escaping (String) -> Void,
+    onComplete: @escaping (Error?) -> Void
+) -> Cancellable
+```
+
+可以包装成：
+
+```swift
+func streamChat() -> AsyncThrowingStream<String, Error> {
+    AsyncThrowingStream { continuation in
+        let cancellable = startStreaming(
+            onToken: { token in
+                continuation.yield(token)
+            },
+            onComplete: { error in
+                if let error {
+                    continuation.finish(throwing: error)
+                } else {
+                    continuation.finish()
+                }
+            }
+        )
+
+        continuation.onTermination = { @Sendable _ in
+            cancellable.cancel()
+        }
+    }
+}
+```
+
+#### 单消费者模型
+
+`AsyncThrowingStream` 更适合单消费者流，不要默认把它当成广播系统：
+
+```text
+一个 producer
+一个 consumer for await
+```
+
+如果需要多个订阅者都收到同一份数据，更适合 Combine `Subject`、actor 自己维护 subscribers，或使用 AsyncAlgorithms 相关工具。
+
+#### 和 Task / Actor 的关系
+
+stream 内部常见写法：
+
+```swift
+AsyncThrowingStream { continuation in
+    let producerTask = Task {
+        ...
+    }
+
+    continuation.onTermination = { @Sendable _ in
+        producerTask.cancel()
+    }
+}
+```
+
+`Task {}` 会继承当前 actor 上下文。如果在 `@MainActor` 中创建 stream，producer task 可能也继承 MainActor。
+
+耗时生产逻辑可以考虑 `Task.detached`，但要注意：
+
+- 不继承 MainActor
+- 捕获内容要满足 `Sendable`
+- 更新 UI 必须切回 `MainActor`
+
+总结：`AsyncThrowingStream = AsyncSequence + Continuation + Buffer + Termination`。
+
 ## 相关
 
 - [[../框架/swiftui-state|SwiftUI 状态观察]]

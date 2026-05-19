@@ -2,7 +2,7 @@
 tags: [pose-estimation, rtmpose, coreml, 姿态检测]
 created: 2026-05-14
 ---
-
+rtmPose项目地址: https://github.com/open-mmlab/mmpose/tree/main/projects/rtmpose
 # RTMPose WholeBody
 
 ## 模型概览
