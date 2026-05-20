@@ -1128,6 +1128,205 @@ AsyncThrowingStream { continuation in
 
 总结：`AsyncThrowingStream = AsyncSequence + Continuation + Buffer + Termination`。
 
+### `AsyncSequence`、`AsyncStream`、`AsyncThrowingStream` 对比
+
+层级关系：
+
+```text
+AsyncSequence
+    ├── AsyncStream<Element>
+    └── AsyncThrowingStream<Element, Failure>
+```
+
+一句话：
+
+```text
+AsyncSequence 是协议。
+AsyncStream 是标准库提供的具体实现。
+AsyncThrowingStream 是 AsyncStream 的可抛错版本。
+```
+
+#### `AsyncSequence`
+
+`AsyncSequence` 是异步版的 `Sequence`，表示“一串异步产生的值”。
+
+同步序列：
+
+```swift
+for value in array {
+    print(value)
+}
+```
+
+异步序列：
+
+```swift
+for await value in asyncSequence {
+    print(value)
+}
+```
+
+如果可能抛错：
+
+```swift
+for try await value in asyncThrowingSequence {
+    print(value)
+}
+```
+
+协议核心大致是：
+
+```swift
+protocol AsyncSequence {
+    associatedtype Element
+    associatedtype AsyncIterator: AsyncIteratorProtocol
+
+    func makeAsyncIterator() -> AsyncIterator
+}
+
+protocol AsyncIteratorProtocol {
+    associatedtype Element
+
+    mutating func next() async throws -> Element?
+}
+```
+
+重点：`next()` 取下一个元素时可能需要 `await`；结束时返回 `nil`；失败时可以 `throw`。
+
+#### `AsyncStream`
+
+`AsyncStream<Element>` 是 Swift 标准库提供的具体类型，用于快速创建一个不抛错的 `AsyncSequence`。
+
+```swift
+func counter() -> AsyncStream<Int> {
+    AsyncStream { continuation in
+        Task {
+            for i in 1...3 {
+                continuation.yield(i)
+            }
+            continuation.finish()
+        }
+    }
+}
+```
+
+消费：
+
+```swift
+for await value in counter() {
+    print(value)
+}
+```
+
+适合包装 callback、delegate、NotificationCenter、WebSocket、传感器数据、UI 事件等不会通过 throw 表达错误的事件流。
+
+#### `AsyncStream` vs `AsyncThrowingStream`
+
+| | AsyncStream | AsyncThrowingStream |
+|---|---|---|
+| 是否抛错 | 不抛错 | 可抛错 |
+| 结束 | `finish()` | `finish()` / `finish(throwing:)` |
+| 消费 | `for await` | `for try await` |
+| 适合 | UI 事件、定时器、通知 | 网络流、文件流、AI token 流 |
+
+不需要错误传播时：
+
+```swift
+func timerTicks() -> AsyncStream<Date> {
+    AsyncStream { continuation in
+        ...
+    }
+}
+```
+
+可能失败时：
+
+```swift
+func streamChat() -> AsyncThrowingStream<String, Error> {
+    AsyncThrowingStream { continuation in
+        ...
+    }
+}
+```
+
+#### `AsyncSequence` vs `AsyncStream`
+
+| | AsyncSequence | AsyncStream |
+|---|---|---|
+| 本质 | 协议 | 具体类型 |
+| 作用 | 定义异步序列能力 | 快速创建异步序列 |
+| 类比 | `Sequence` | `Array` / 自定义序列的一种 |
+| 是否可直接实例化 | 不可以 | 可以 |
+| 是否需要自己实现 iterator | 通常需要 | 不需要 |
+| 适合场景 | 设计抽象 API | 包装 callback / 事件流 |
+
+类比：
+
+```text
+Sequence       ≈ 协议
+Array          ≈ 一个具体 Sequence
+
+AsyncSequence  ≈ 协议
+AsyncStream    ≈ 一个具体 AsyncSequence
+```
+
+不能直接创建 `AsyncSequence`：
+
+```swift
+let stream = AsyncSequence<String>() // 不存在
+```
+
+要么用具体实现：
+
+```swift
+let stream = AsyncStream<String> { continuation in
+    continuation.yield("hello")
+    continuation.finish()
+}
+```
+
+要么自己实现协议：
+
+```swift
+struct CounterSequence: AsyncSequence {
+    typealias Element = Int
+
+    struct Iterator: AsyncIteratorProtocol {
+        var current = 0
+
+        mutating func next() async -> Int? {
+            guard current < 3 else { return nil }
+            current += 1
+            return current
+        }
+    }
+
+    func makeAsyncIterator() -> Iterator {
+        Iterator()
+    }
+}
+```
+
+#### 什么时候用哪个
+
+```text
+定义抽象能力 -> AsyncSequence
+手动创建不抛错事件流 -> AsyncStream
+手动创建会抛错事件流 -> AsyncThrowingStream
+```
+
+API 设计中，如果想隐藏具体实现，可以返回 opaque type：
+
+```swift
+func events() -> some AsyncSequence<Event> {
+    AsyncStream { continuation in
+        ...
+    }
+}
+```
+
+网络流通常用 `AsyncThrowingStream`，因为网络天然可能失败。
+
 ## 相关
 
 - [[../框架/swiftui-state|SwiftUI 状态观察]]

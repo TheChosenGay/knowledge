@@ -185,6 +185,7 @@
   },
   "active": "4c4523d429a8bf48",
   "lastOpenFiles": [
+    "技术基础/框架/swiftui-uikit-interop.md",
     "swiftdata_modelcontext_concurrency.md",
     "技术基础/项目/fit-rtmpose-plan.md",
     "投资/量化/第一次因子回测.md",
@@ -215,7 +216,6 @@
     "软件设计/基础设施/Docker-K8s/index.md",
     "软件设计/存储/MySQL/index.md",
     "软件设计/存储/MySQL/index.md.tmp.59326.8c39cf19d598",
-    "软件设计/存储/Kafka/index.md",
     "软件设计/系统设计/频道成员列表设计",
     "软件设计/系统设计/缓存系统设计",
     "软件设计/系统设计/日志系统设计",
