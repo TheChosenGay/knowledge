@@ -9,6 +9,8 @@
 - [[fit-rtmpose-plan|RTMPose 升级方案]] — 双模型方案设计
 - [[fit-motion-compare|动作对比]] — 动作对比功能
 - [[fit-ai-voice-coach|AI 语音教练]] — 语音教练设计
+- [[fit-tts-solutions|TTS 方案选型]] — 文字转语音/音色方案对比（云API、开源模型、端侧）
+- [[fit-pose-evaluation-next-gen|姿态评估下一代方案]] — 绕过角度精度瓶颈：Embedding + VLM + 运动学
 
 - [[fit-standard-exercise-model|标准动作模型库]] — 后台模型管线 + 客户端评分方案
 - [[fit-exercise-config-schema|动作配置驱动方案]] — JSON Schema 三层分离，AI 生成配置
